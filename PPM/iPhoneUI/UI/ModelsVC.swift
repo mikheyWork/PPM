@@ -28,7 +28,9 @@ class ModelsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Ta
         rangeChar()
         indexFunc()
         
-
+        for i in appDelegate.childs {
+            print("a is \(i.name)")
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
