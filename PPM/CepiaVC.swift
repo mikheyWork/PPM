@@ -34,8 +34,6 @@ class CepiaVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         NotificationCenter.default.addObserver(self, selector: #selector(showCongr), name: NSNotification.Name("Check"), object: nil)
          NotificationCenter.default.addObserver(self, selector: #selector(fireBaseSub), name: NSNotification.Name("CheckSub"), object: nil)
         
-        appDelegate.subscribtion = true
-        
         searchBarLbl.delegate = self
         
         
