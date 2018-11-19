@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="aIK-4l-6Mh">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Lato-Regular.ttf">
+            <string>Lato-Regular</string>
+        </array>
+    </customFonts>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="PGb-fG-8K1">
+            <objects>
+                <viewController id="aIK-4l-6Mh" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="lGs-R3-aTs">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zrr-eq-IN3">
+                                <rect key="frame" x="88" y="589" width="199" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="Nc1-pd-DfQ"/>
+                                </constraints>
+                                <attributedString key="attributedText">
+                                    <fragment content="CEPIA">
+                                        <attributes>
+                                            <color key="NSColor" red="0.12549019610000001" green="0.18039215689999999" blue="0.23921568630000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <font key="NSFont" size="20" name="Lato-Regular"/>
+                                            <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="charWrapping" baseWritingDirection="natural" hyphenationFactor="5" tighteningFactorForTruncation="0.0" allowsDefaultTighteningForTruncation="NO"/>
+                                        </attributes>
+                                    </fragment>
+                                </attributedString>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="cepia.com.au" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vTq-Gd-l7l">
+                                <rect key="frame" x="88" y="615" width="199" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="MIY-Zs-dsD"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Lato-Regular" family="Lato" pointSize="18"/>
+                                <color key="textColor" red="0.70980392160000005" green="0.75686274509999996" blue="0.81176470590000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="test2" translatesAutoresizingMaskIntoConstraints="NO" id="b8Y-aa-Xau">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="vTq-Gd-l7l" firstAttribute="leading" secondItem="QWP-WT-bWZ" secondAttribute="leading" constant="88" id="0hB-0j-xLa"/>
+                            <constraint firstItem="vTq-Gd-l7l" firstAttribute="top" secondItem="zrr-eq-IN3" secondAttribute="bottom" constant="4" id="Cue-dm-P14"/>
+                            <constraint firstItem="QWP-WT-bWZ" firstAttribute="trailing" secondItem="zrr-eq-IN3" secondAttribute="trailing" constant="88" id="CxT-lU-HNI"/>
+                            <constraint firstItem="b8Y-aa-Xau" firstAttribute="bottom" secondItem="QWP-WT-bWZ" secondAttribute="bottom" id="bAI-N8-N6h"/>
+                            <constraint firstItem="zrr-eq-IN3" firstAttribute="leading" secondItem="QWP-WT-bWZ" secondAttribute="leading" constant="88" id="bvT-58-YXa"/>
+                            <constraint firstItem="QWP-WT-bWZ" firstAttribute="bottom" secondItem="vTq-Gd-l7l" secondAttribute="bottom" constant="30" id="chm-OI-jBm"/>
+                            <constraint firstItem="b8Y-aa-Xau" firstAttribute="leading" secondItem="QWP-WT-bWZ" secondAttribute="leading" id="dBu-fg-U8A"/>
+                            <constraint firstItem="b8Y-aa-Xau" firstAttribute="trailing" secondItem="QWP-WT-bWZ" secondAttribute="trailing" id="esT-Dz-xJ0"/>
+                            <constraint firstItem="QWP-WT-bWZ" firstAttribute="trailing" secondItem="vTq-Gd-l7l" secondAttribute="trailing" constant="88" id="yZj-ds-Ehg"/>
+                            <constraint firstItem="b8Y-aa-Xau" firstAttribute="top" secondItem="lGs-R3-aTs" secondAttribute="top" id="z60-xW-a01"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="QWP-WT-bWZ"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="8Bd-eO-4kT"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4CC-Cs-Ws8" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="781.60000000000002" y="373.76311844077964"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="test2" width="375" height="768"/>
+    </resources>
+</document>

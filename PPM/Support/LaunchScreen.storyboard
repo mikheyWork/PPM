@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="nSH-7K-uAw">
+    <device id="ipad9_7" orientation="landscape">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="3EN-vU-OYN">
+            <objects>
+                <viewController id="nSH-7K-uAw" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="vmA-KS-Ggn">
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Group 3" translatesAutoresizingMaskIntoConstraints="NO" id="sQ6-b3-nL8">
+                                <rect key="frame" x="399.5" y="281" width="225" height="226"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Group 4" translatesAutoresizingMaskIntoConstraints="NO" id="FR0-3T-4pa">
+                                <rect key="frame" x="461" y="704" width="102" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="FR0-3T-4pa" secondAttribute="height" multiplier="51:22" id="6Rg-XS-nL2"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="FN8-85-vLL" firstAttribute="trailing" secondItem="FR0-3T-4pa" secondAttribute="trailing" constant="461" id="Fra-JD-To5"/>
+                            <constraint firstItem="FN8-85-vLL" firstAttribute="bottom" secondItem="FR0-3T-4pa" secondAttribute="bottom" constant="20" id="GKT-9N-CQk"/>
+                            <constraint firstItem="FR0-3T-4pa" firstAttribute="centerX" secondItem="FN8-85-vLL" secondAttribute="centerX" id="Nak-nd-5WB"/>
+                            <constraint firstItem="FR0-3T-4pa" firstAttribute="leading" secondItem="FN8-85-vLL" secondAttribute="leading" constant="461" id="jWT-FZ-r6M"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="FN8-85-vLL"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aWC-jn-ooV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="36.9140625" y="-883.59375"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Group 3" width="225" height="162"/>
+        <image name="Group 4" width="102" height="44"/>
+    </resources>
+</document>
