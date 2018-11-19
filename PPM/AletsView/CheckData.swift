@@ -10,7 +10,21 @@ class CheckDataController: UIViewController {
     @IBOutlet weak var progressBar: GTProgressBar!
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    var progressCount: CGFloat = 0.0
+    var progressCount: CGFloat = 0.0 {
+        didSet {
+            //            print("count is \(progressCount)")
+            self.progressBar.animateTo(progress: self.progressCount)
+            if self.progressBar.progress >= 1 {
+                Thread.sleep(forTimeInterval: 0.25)
+                DispatchQueue.main.async(flags: .barrier) {
+                    self.appDelegate.closeCheckData = true
+                    Thread.sleep(forTimeInterval: 0.5)
+                    self.removeFromParent()
+                    self.view.removeFromSuperview()
+                }
+            }
+        }
+    }
     
     override func viewDidLoad() {
         alertView.layer.cornerRadius = 15
@@ -21,16 +35,12 @@ class CheckDataController: UIViewController {
         DispatchQueue.global(qos: .userInteractive).async {
             self.checkDataPdfRef(page: 1)
             self.checkDataPdfProd(page: 1)
-            if self.appDelegate.networkProd.isEmpty == false && self.appDelegate.networkProd != nil && self.appDelegate.networkRef.isEmpty == false && self.appDelegate.networkRef != nil {
+            if self.appDelegate.networkProd.isEmpty == false &&  self.appDelegate.networkRef.isEmpty == false {
                 self.checkActualData()
+            }
         }
         
-        
-        }
         self.progressBar.progress = 0.0
-        
-        
-        
     }
     
     
@@ -66,14 +76,14 @@ class CheckDataController: UIViewController {
         for i in appDelegate.referencesChild {
             if appDelegate.networkRef.contains(where: {$0 == i.name}) == false {
                 appDelegate.referencesChild = appDelegate.referencesChild.filter({$0.name != i.name})
-                var name2 = PDFDownloader.shared.addPercent(fromString: i.name!)
+                let name2 = PDFDownloader.shared.addPercent(fromString: i.name!)
                 appDelegate.removeFile(name: name2)
                 appDelegate.deleteFromCoreDataRef(id: i.id)
                 print("deleted \(i.name)")
             }
         }
     }
-  
+    
     
     func checkDataPdfRef(page: Int) {
         let url = URL(string: "http://ppm.customertests.com/wp-json/wp/v2/reference?page=\(page)&per_page=100")
@@ -104,7 +114,6 @@ class CheckDataController: UIViewController {
                 let name2 = PDFDownloader.shared.addPercent(fromString: name)
                 let finishLink = PDFDownloader.shared.removeHtmlSymbols(fromString: startLink, name: name2)
                 if name != "false" && name != ""  {
-//                print("name ref is \(name)")
                     //prog
                     if resault["parent"].intValue != 0 {
                         
@@ -122,14 +131,9 @@ class CheckDataController: UIViewController {
                             }
                         }
                         if count != 0 && count != nil {
+                            print("add1 + \(CGFloat(1 / count!))")
                             self.progressCount += CGFloat(1 / count!)
                         }
-                        
-                        
-                        
-                        
-                        
-                        
                         
                         if self.appDelegate.networkPdfRef.contains(where: {$0.title == name}) {
                             if self.appDelegate.curentPdfRef.contains(where: {$0.title == name}) {
@@ -208,22 +212,6 @@ class CheckDataController: UIViewController {
                         }
                     }
                 }
-                
-                Thread.sleep(forTimeInterval: 0.25)
-                DispatchQueue.main.async(flags: .barrier) {
-                    self.progressBar.animateTo(progress: self.progressCount)
-                    
-                    DispatchQueue.main.async {
-                        if self.progressBar.progress >= 1 {
-                            Thread.sleep(forTimeInterval: 0.5)
-                            self.appDelegate.closeCheckData = true
-                            self.removeFromParent()
-                            self.view.removeFromSuperview()
-                        }
-                    }
-                }
-                
-               
             }
             //end alamofire
         }
@@ -235,7 +223,7 @@ class CheckDataController: UIViewController {
         guard url != nil else {
             return
         }
-
+        
         Alamofire.request(url!, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { (response) in
             let json = JSON(response.result.value!)
             let resaults = json[].arrayValue
@@ -274,6 +262,7 @@ class CheckDataController: UIViewController {
                         }
                     }
                     if count != 0 && count != nil {
+                        print("add2 + \(CGFloat(1 / count!))")
                         self.progressCount += CGFloat(1 / count!)
                     }
                     
@@ -312,7 +301,6 @@ class CheckDataController: UIViewController {
                     var max_lead_diameter: String?
                     var placement: String?
                     var number_of_hv_coils: String?
-                    //
                     
                     //filter fields
                     
@@ -493,98 +481,34 @@ class CheckDataController: UIViewController {
                     }
                     
                     
-                    
-                        if self.appDelegate.networkPdf.contains(where: {$0.model_name == name}) || self.appDelegate.networkPdf.contains(where: {$0.model_number == number})  {
+                    if self.appDelegate.networkPdf.contains(where: {$0.model_name == name}) || self.appDelegate.networkPdf.contains(where: {$0.model_number == number})  {
+                        
+                        if self.appDelegate.curentPdf.contains(where: {$0.model_name == name}) || self.appDelegate.curentPdf.contains(where: {$0.model_number == number}) {
+                            //chek cuttent updates
+                            var networkAlert = self.appDelegate.networkPdf.filter({$0.model_name == name})
+                            if networkAlert.isEmpty == true {
+                                networkAlert = self.appDelegate.networkPdf.filter({$0.model_number == number})
+                            }
+                            print("new element3 \(name)")
                             
-                            if self.appDelegate.curentPdf.contains(where: {$0.model_name == name}) || self.appDelegate.curentPdf.contains(where: {$0.model_number == number}) {
-                                //chek cuttent updates
-                                var networkAlert = self.appDelegate.networkPdf.filter({$0.model_name == name})
-                                if networkAlert.isEmpty == true {
-                                    networkAlert = self.appDelegate.networkPdf.filter({$0.model_number == number})
-                                }
-                                print("new element3 \(name)")
-                               
-                                if networkAlert.first?.modified != resault["modified"].stringValue {
-                                    if  name == "" || name == "false" {
-                                        print("modified \(name)")
-                                        self.appDelegate.networkPdf = self.appDelegate.networkPdf.filter({$0.model_number != resault["acf"]["model_number"].stringValue})
-                                        self.appDelegate.curentPdf =  self.appDelegate.curentPdf.filter({$0.model_number != resault["acf"]["model_number"].stringValue})
-                                        let name2 = resault["acf"]["model_number"].stringValue
-                                        self.appDelegate.removeFile(name: "\(name2)Alert")
-                                        self.appDelegate.removeFile(name: "\(name2)Info")
-                                    } else {
-                                        print("woof")
+                            if networkAlert.first?.modified != resault["modified"].stringValue {
+                                if  name == "" || name == "false" {
+                                    print("modified \(name)")
+                                    self.appDelegate.networkPdf = self.appDelegate.networkPdf.filter({$0.model_number != resault["acf"]["model_number"].stringValue})
+                                    self.appDelegate.curentPdf =  self.appDelegate.curentPdf.filter({$0.model_number != resault["acf"]["model_number"].stringValue})
+                                    let name2 = resault["acf"]["model_number"].stringValue
+                                    self.appDelegate.removeFile(name: "\(name2)Alert")
+                                    self.appDelegate.removeFile(name: "\(name2)Info")
+                                } else {
+                                    print("woof")
                                     self.appDelegate.networkPdf = self.appDelegate.networkPdf.filter({$0.model_name != resault["acf"]["model_name"].stringValue})
                                     self.appDelegate.curentPdf =  self.appDelegate.curentPdf.filter({$0.model_name != resault["acf"]["model_name"].stringValue})
                                     let name2 = resault["acf"]["model_name"].stringValue
                                     self.appDelegate.removeFile(name: "\(name2)Alert")
                                     self.appDelegate.removeFile(name: "\(name2)Info")
-                                    }
-                                    
-                                    //change
-                                    let object = PdfDocumentInfo(alerts: alerts,
-                                                                 model_number: model_number,
-                                                                 info: info,
-                                                                 model_name: model_name,
-                                                                 manufacturer: manufacturer,
-                                                                 modified: modified,
-                                                                 nbg_code: nbg_code,
-                                                                 polarity: polarity,
-                                                                 sensor_type: sensor_type,
-                                                                 dimensions_size: dimensions_size,
-                                                                 dimensions_weight: dimensions_weight,
-                                                                 connectores_pace_sense: connectores_pace_sense,
-                                                                 mri_conditional: mri_conditional,
-                                                                 wireless_telemetry: wireless_telemetry,
-                                                                 remote_monitoring: remote_monitoring,
-                                                                 non_magnet_rate: non_magnet_rate,
-                                                                 magnet_rate_bol: magnet_rate_bol,
-                                                                 magnet_rate_eri_eol: magnet_rate_eri_eol,
-                                                                 patient_alert_feature: patient_alert_feature,
-                                                                 detach_tools: detach_tools,
-                                                                 x_rey_id: x_rey_id,
-                                                                 nbd_code: nbd_code,
-                                                                 max_energy: max_energy,
-                                                                 hv_waveform: hv_waveform,
-                                                                 connectores_hight_voltage: connectores_hight_voltage,
-                                                                 eri_notes: eri_notes,
-                                                                 bol_characteristics: bol_characteristics,
-                                                                 eri_eol_characteristics: eri_eol_characteristics,
-                                                                 lead_polarity: lead_polarity,
-                                                                 fixation: fixation,
-                                                                 insulation_material: insulation_material,
-                                                                 max_lead_diameter: max_lead_diameter,
-                                                                 placement: placement,
-                                                                 number_of_hv_coils: number_of_hv_coils)
-                                    //
-                                    self.appDelegate.networkPdf.append(object)
-                                    self.appDelegate.curentPdf.append(object)
-                                    print("on3 \(object.model_name)")
-                                    if name == "" || name == "false" {
-                                        let name3 = PDFDownloader.shared.addPercent(fromString: number)
-                                        PDFDownloader.shared.dowloandAndSave(name: "\(name3)Alert.pdf", url: URL(string: object.alerts!)!)
-                                        PDFDownloader.shared.dowloandAndSave(name: "\(name3)Info.pdf", url: URL(string:
-                                            object.info!)!)
-                                    } else {
-                                        let name3 = PDFDownloader.shared.addPercent(fromString: name)
-                                        PDFDownloader.shared.dowloandAndSave(name: "\(name3)Alert.pdf", url: URL(string: object.alerts!)!)
-                                        PDFDownloader.shared.dowloandAndSave(name: "\(name3)Info.pdf", url: URL(string:
-                                            object.info!)!)
-                                    }
-                                    
-                                    
-                                    
-                                    let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.appDelegate.networkPdf)
-                                    UserDefaults.standard.set(encodedData, forKey: "networkPdf")
-                                    UserDefaults.standard.synchronize()
-                                    
-                                    let encodedData2: Data = NSKeyedArchiver.archivedData(withRootObject: self.appDelegate.curentPdf)
-                                    UserDefaults.standard.set(encodedData2, forKey: "curentPdf")
-                                    UserDefaults.standard.synchronize()
                                 }
                                 
-                            } else {
-                                print("new element2 \(name)")
+                                //change
                                 let object = PdfDocumentInfo(alerts: alerts,
                                                              model_number: model_number,
                                                              info: info,
@@ -619,8 +543,10 @@ class CheckDataController: UIViewController {
                                                              max_lead_diameter: max_lead_diameter,
                                                              placement: placement,
                                                              number_of_hv_coils: number_of_hv_coils)
+                                //
+                                self.appDelegate.networkPdf.append(object)
                                 self.appDelegate.curentPdf.append(object)
-                                print("on2 \(object.model_name)")
+                                print("on3 \(object.model_name)")
                                 if name == "" || name == "false" {
                                     let name3 = PDFDownloader.shared.addPercent(fromString: number)
                                     PDFDownloader.shared.dowloandAndSave(name: "\(name3)Alert.pdf", url: URL(string: object.alerts!)!)
@@ -633,6 +559,8 @@ class CheckDataController: UIViewController {
                                         object.info!)!)
                                 }
                                 
+                                
+                                
                                 let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.appDelegate.networkPdf)
                                 UserDefaults.standard.set(encodedData, forKey: "networkPdf")
                                 UserDefaults.standard.synchronize()
@@ -641,9 +569,9 @@ class CheckDataController: UIViewController {
                                 UserDefaults.standard.set(encodedData2, forKey: "curentPdf")
                                 UserDefaults.standard.synchronize()
                             }
+                            
                         } else {
-                                                print("new element \(name)")
-                            //change
+                            print("new element2 \(name)")
                             let object = PdfDocumentInfo(alerts: alerts,
                                                          model_number: model_number,
                                                          info: info,
@@ -678,10 +606,8 @@ class CheckDataController: UIViewController {
                                                          max_lead_diameter: max_lead_diameter,
                                                          placement: placement,
                                                          number_of_hv_coils: number_of_hv_coils)
-                            
-                            self.appDelegate.networkPdf.append(object)
                             self.appDelegate.curentPdf.append(object)
-                            print("on \(object.model_name)")
+                            print("on2 \(object.model_name)")
                             if name == "" || name == "false" {
                                 let name3 = PDFDownloader.shared.addPercent(fromString: number)
                                 PDFDownloader.shared.dowloandAndSave(name: "\(name3)Alert.pdf", url: URL(string: object.alerts!)!)
@@ -694,8 +620,6 @@ class CheckDataController: UIViewController {
                                     object.info!)!)
                             }
                             
-                            
-                            
                             let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.appDelegate.networkPdf)
                             UserDefaults.standard.set(encodedData, forKey: "networkPdf")
                             UserDefaults.standard.synchronize()
@@ -704,32 +628,79 @@ class CheckDataController: UIViewController {
                             UserDefaults.standard.set(encodedData2, forKey: "curentPdf")
                             UserDefaults.standard.synchronize()
                         }
+                    } else {
+                        print("new element \(name)")
+                        //change
+                        let object = PdfDocumentInfo(alerts: alerts,
+                                                     model_number: model_number,
+                                                     info: info,
+                                                     model_name: model_name,
+                                                     manufacturer: manufacturer,
+                                                     modified: modified,
+                                                     nbg_code: nbg_code,
+                                                     polarity: polarity,
+                                                     sensor_type: sensor_type,
+                                                     dimensions_size: dimensions_size,
+                                                     dimensions_weight: dimensions_weight,
+                                                     connectores_pace_sense: connectores_pace_sense,
+                                                     mri_conditional: mri_conditional,
+                                                     wireless_telemetry: wireless_telemetry,
+                                                     remote_monitoring: remote_monitoring,
+                                                     non_magnet_rate: non_magnet_rate,
+                                                     magnet_rate_bol: magnet_rate_bol,
+                                                     magnet_rate_eri_eol: magnet_rate_eri_eol,
+                                                     patient_alert_feature: patient_alert_feature,
+                                                     detach_tools: detach_tools,
+                                                     x_rey_id: x_rey_id,
+                                                     nbd_code: nbd_code,
+                                                     max_energy: max_energy,
+                                                     hv_waveform: hv_waveform,
+                                                     connectores_hight_voltage: connectores_hight_voltage,
+                                                     eri_notes: eri_notes,
+                                                     bol_characteristics: bol_characteristics,
+                                                     eri_eol_characteristics: eri_eol_characteristics,
+                                                     lead_polarity: lead_polarity,
+                                                     fixation: fixation,
+                                                     insulation_material: insulation_material,
+                                                     max_lead_diameter: max_lead_diameter,
+                                                     placement: placement,
+                                                     number_of_hv_coils: number_of_hv_coils)
+                        
+                        self.appDelegate.networkPdf.append(object)
+                        self.appDelegate.curentPdf.append(object)
+                        print("on \(object.model_name)")
+                        if name == "" || name == "false" {
+                            let name3 = PDFDownloader.shared.addPercent(fromString: number)
+                            PDFDownloader.shared.dowloandAndSave(name: "\(name3)Alert.pdf", url: URL(string: object.alerts!)!)
+                            PDFDownloader.shared.dowloandAndSave(name: "\(name3)Info.pdf", url: URL(string:
+                                object.info!)!)
+                        } else {
+                            let name3 = PDFDownloader.shared.addPercent(fromString: name)
+                            PDFDownloader.shared.dowloandAndSave(name: "\(name3)Alert.pdf", url: URL(string: object.alerts!)!)
+                            PDFDownloader.shared.dowloandAndSave(name: "\(name3)Info.pdf", url: URL(string:
+                                object.info!)!)
+                        }
+                        
+                        
+                        
+                        let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: self.appDelegate.networkPdf)
+                        UserDefaults.standard.set(encodedData, forKey: "networkPdf")
+                        UserDefaults.standard.synchronize()
+                        
+                        let encodedData2: Data = NSKeyedArchiver.archivedData(withRootObject: self.appDelegate.curentPdf)
+                        UserDefaults.standard.set(encodedData2, forKey: "curentPdf")
+                        UserDefaults.standard.synchronize()
                     }
                 }
-                
-                Thread.sleep(forTimeInterval: 0.25)
-                DispatchQueue.main.async(flags: .barrier) {
-                    self.progressBar.animateTo(progress: self.progressCount)
-                    DispatchQueue.main.async {
-                        if self.progressBar.progress >= 1 {
-                            print("close2")
-                            Thread.sleep(forTimeInterval: 0.5)
-                            self.appDelegate.closeCheckData = true
-                            self.removeFromParent()
-                            self.view.removeFromSuperview()
-                        }
-                    }
-                }
-                for i in self.appDelegate.childs {
-                    let a = self.appDelegate.childs.filter({$0.parent == i.id})
-                    if a.isEmpty {
-                        if self.appDelegate.models.contains(where: {$0.name == i.name}) == false {
-                            self.appDelegate.models.append(i)
-                        }
-                    }
             }
-            for i in self.appDelegate.curentPdf {
-                print("mod is \(i.model_name)")
+            
+            for i in self.appDelegate.childs {
+                let a = self.appDelegate.childs.filter({$0.parent == i.id})
+                if a.isEmpty {
+                    if self.appDelegate.models.contains(where: {$0.name == i.name}) == false {
+                        self.appDelegate.models.append(i)
+                    }
+                }
             }
         }
         //end alamofire
