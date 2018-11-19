@@ -48,9 +48,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if Reachability.isConnectedToNetwork() {
                 self.checkSub(id: "mikhey.PPM.Genius3.Subscription", sharedSecret: "523764ba89824292bc45e96ae17f1137")
             }
-            self.check()
         }
-    
+        self.check()
         
         //        reqPdf()
         FirebaseApp.configure()
@@ -107,10 +106,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("dont workl2")
         }
         
-        //delete data(core data)
-        //        removeDataFrom(entity: "ReferEnt")
-        
-        //if need
+//        delete data(core data)
+//                removeDataFrom(entity: "CategoryEnt")
+//        CategoryEnt
+//        if need
         Thread.sleep(forTimeInterval: 1.0)
         
         
@@ -154,15 +153,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     @objc func check() {
         if Reachability.isConnectedToNetwork() == true {
+            removeDataFrom(entity: "CategoryEnt")
+            removeDataFrom(entity: "ReferEnt")
+            filter()
             req(page: 1)
             reqRef(page: 1)
             reqProductsDocCount(page: 1)
             reqRefsDocCount(page: 1)
             filter()
         } else {
-            //core data
             fetchCoreData()
-            fetchCoreDataRef()
+                        fetchCoreDataRef()
             filter()
         }
     }

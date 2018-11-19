@@ -14,10 +14,11 @@ class CheckDataController: UIViewController {
         didSet {
             //            print("count is \(progressCount)")
             self.progressBar.animateTo(progress: self.progressCount)
-            if self.progressBar.progress >= 1 {
+            if self.progressBar.progress >= 0.99 {
                 Thread.sleep(forTimeInterval: 0.25)
                 DispatchQueue.main.async(flags: .barrier) {
                     self.appDelegate.closeCheckData = true
+                    print("close2")
                     Thread.sleep(forTimeInterval: 0.5)
                     self.removeFromParent()
                     self.view.removeFromSuperview()

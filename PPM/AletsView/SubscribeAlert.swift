@@ -51,8 +51,6 @@ class SubscribeAlert: UIViewController {
             
         }
         
-//            self.showSub(nameVC: "CheckDataController")
-        
         
         self.removeFromParent()
         self.view.removeFromSuperview()
