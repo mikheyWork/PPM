@@ -42,14 +42,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var closeCheckData = false
     
+    var refSub: DatabaseReference!
+    var user: UserModel!
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         DispatchQueue.global(qos: .userInteractive).async {
             if Reachability.isConnectedToNetwork() {
                 self.checkSub(id: "mikhey.PPM.Genius3.Subscription", sharedSecret: "523764ba89824292bc45e96ae17f1137")
             }
+            self.reqProductsDocCount(page: 1)
+            self.reqRefsDocCount(page: 1)
         }
-        self.check()
+        
+        
+            self.check()
+        
         
         //        reqPdf()
         FirebaseApp.configure()
@@ -110,12 +118,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                removeDataFrom(entity: "CategoryEnt")
 //        CategoryEnt
 //        if need
-        Thread.sleep(forTimeInterval: 1.0)
+        Thread.sleep(forTimeInterval: 2.0)
         
         
         //if need delete file
         //        removeFile(name: " ")
-        
         
         return true
     }
@@ -158,8 +165,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             filter()
             req(page: 1)
             reqRef(page: 1)
-            reqProductsDocCount(page: 1)
-            reqRefsDocCount(page: 1)
             filter()
         } else {
             fetchCoreData()
@@ -455,7 +460,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     //check sub
+    
+    
     func checkSub(id: String, sharedSecret: String) {
+
+        
         let appleValidator = AppleReceiptValidator(service: .production, sharedSecret: sharedSecret)
         SwiftyStoreKit.verifyReceipt(using: appleValidator) { result in
             switch result {
@@ -472,18 +481,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     DispatchQueue.main.async {
                         print("subso purchased is \(self.subscribtion)")
                         if self.closeCheckData == false {
-                            NotificationCenter.default.post(name: NSNotification.Name("CheckSub"), object: nil)
+                            NotificationCenter.default.post(name: NSNotification.Name("Check"), object: nil)
                         }
                     }
                     
                     print("\(id) is valid until \(expiryDate)\n\(items)\n")
                 case .expired(let expiryDate, let items):
-                    //релиз
+                    //change
                     self.subscribtion = false
-                    //                    self.subscribtion = false
+//                    DispatchQueue.main.async {
+//                        print("subso purchased is \(self.subscribtion)")
+//                        if self.closeCheckData == false {
+//                            NotificationCenter.default.post(name: NSNotification.Name("Check"), object: nil)
+//                        }
+//                    }
                     print("\(id) is expired since \(expiryDate)\n\(items)\n")
                 case .notPurchased:
-                    //релиз
                     self.subscribtion = false
                     //                    self.subscribtion = false
                     print("The user has never purchased \(id)")
@@ -495,10 +508,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 //                    self.subscribtion = false
                 print("Receipt verification failed: \(error)")
             }
-            NotificationCenter.default.post(name: NSNotification.Name("CheckSub"), object: nil)
             print("subs is \(self.subscribtion)")
             UserDefaults.standard.set(self.subscribtion, forKey: "subscribe2")
             
+                guard let currentUser = Auth.auth().currentUser else { return }
+            if currentUser == Auth.auth().currentUser {
+            self.user = UserModel(user: currentUser)
+            self.refSub = Database.database().reference(withPath: "users").child((self.user.uid)).child("subscription")
+            self.refSub.setValue(["subscription": self.subscribtion])
+                print("donene")
+            }
         }
     }
     

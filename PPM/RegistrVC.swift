@@ -56,10 +56,6 @@ class RegistrVC: UIViewController {
             return
         }
         
-        if password != rePassText.text {
-            showAlertError(title: "Create Account Failed", withText: "Passwords don’t match.")
-        }
-        
         Auth.auth().createUser(withEmail: email, password: password) { [weak self] (user, error) in
             
             if error != nil {
@@ -79,8 +75,12 @@ class RegistrVC: UIViewController {
             
             let userRef  = self?.ref.child((user?.user.uid)!)
             userRef?.setValue(["email": user?.user.email])
-            
-            self!.performSegue(withIdentifier: "loginAfterRegister", sender: nil)
+            if password != self!.rePassText.text {
+                self!.showAlertError(title: "Create Account Failed", withText: "Passwords don’t match.")
+            } else {
+                self!.performSegue(withIdentifier: "loginAfterRegister", sender: nil)
+                NotificationCenter.default.post(name: NSNotification.Name("CheckSub"), object: nil)
+            }
             
             //alert
 //            let alert = UIAlertController(title: "Register", message: "Congratulation.", preferredStyle: .alert)
@@ -105,7 +105,6 @@ class RegistrVC: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        appDelegate.subscribtion = false
         if appDelegate.model == "iPhone"{
             if segue.identifier == "loginAfterRegister" {
                 guard let currentUser = Auth.auth().currentUser else { return }

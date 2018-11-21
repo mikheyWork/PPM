@@ -10,15 +10,24 @@ class CheckDataController: UIViewController {
     @IBOutlet weak var progressBar: GTProgressBar!
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
+    var point1: CGFloat = 0.0
+    var point2: CGFloat =  0.0
+    var count10 = 0
+    var countAll: CGFloat = 0.0
     var progressCount: CGFloat = 0.0 {
         didSet {
-            //            print("count is \(progressCount)")
+                        print("count is \(progressCount)")
             self.progressBar.animateTo(progress: self.progressCount)
+            print("count1 \(appDelegate.allCountDoc)")
+            print("count2 \(appDelegate.productsDocCount)")
+            print("count3 \(appDelegate.refsDocCount)")
+            // check count
             if self.progressBar.progress >= 0.99 {
                 Thread.sleep(forTimeInterval: 0.25)
                 DispatchQueue.main.async(flags: .barrier) {
                     self.appDelegate.closeCheckData = true
-                    print("close2")
+                    print("close1")
                     Thread.sleep(forTimeInterval: 0.5)
                     self.removeFromParent()
                     self.view.removeFromSuperview()
@@ -28,20 +37,23 @@ class CheckDataController: UIViewController {
     }
     
     override func viewDidLoad() {
+        print("appd \(appDelegate.allCountDoc)")
+        self.point2 = CGFloat(1 / self.appDelegate.allCountDoc)
+        self.progressBar.progress = 0.0
         alertView.layer.cornerRadius = 15
-        
+        appDelegate.closeCheckData = true
         view.backgroundColor = UIColor.black.withAlphaComponent(0.2)
         
         
-        DispatchQueue.global(qos: .userInteractive).async {
+//        DispatchQueue.global(qos: .userInteractive).async {
+        Thread.sleep(forTimeInterval: 1.0)
+            self.countAll = self.appDelegate.allCountDoc
             self.checkDataPdfRef(page: 1)
             self.checkDataPdfProd(page: 1)
             if self.appDelegate.networkProd.isEmpty == false &&  self.appDelegate.networkRef.isEmpty == false {
                 self.checkActualData()
-            }
+//            }
         }
-        
-        self.progressBar.progress = 0.0
     }
     
     
@@ -110,6 +122,13 @@ class CheckDataController: UIViewController {
                 self.appDelegate.allCountDoc = self.appDelegate.refsDocCount + self.appDelegate.productsDocCount
             }
             for resault in resaults {
+                self.count10 += 1
+                print("count9 \(self.count10)")
+                
+                self.point2 = CGFloat(1 / self.appDelegate.allCountDoc)
+                self.progressCount += self.point2
+                print("point1 \(self.point2)")
+
                 let name = resault["title"]["rendered"].stringValue
                 let startLink = resault["acf"]["references"].stringValue
                 let name2 = PDFDownloader.shared.addPercent(fromString: name)
@@ -117,24 +136,7 @@ class CheckDataController: UIViewController {
                 if name != "false" && name != ""  {
                     //prog
                     if resault["parent"].intValue != 0 {
-                        
-                        let countPdfProd = self.appDelegate.productsDocCount
-                        let countPdfRef = self.appDelegate.refsDocCount
-                        var count: CGFloat!
-                        if countPdfRef != nil && countPdfRef != 0 && countPdfProd != nil && countPdfProd != 0 && self.appDelegate.allCountDoc != nil {
-                            count = self.appDelegate.allCountDoc! - countPdfProd!
-                        } else {
-                            if countPdfProd != nil {
-                                count = CGFloat(countPdfProd!)
-                            } else {
-                                self.removeFromParent()
-                                self.view.removeFromSuperview()
-                            }
-                        }
-                        if count != 0 && count != nil {
-                            print("add1 + \(CGFloat(1 / count!))")
-                            self.progressCount += CGFloat(1 / count!)
-                        }
+                      
                         
                         if self.appDelegate.networkPdfRef.contains(where: {$0.title == name}) {
                             if self.appDelegate.curentPdfRef.contains(where: {$0.title == name}) {
@@ -212,6 +214,10 @@ class CheckDataController: UIViewController {
                             //                            }
                         }
                     }
+                    print("1")
+                    if self.progressBar.progress < 1 {
+                        self.progressBar.progress += self.point1
+                    }
                 }
             }
             //end alamofire
@@ -243,29 +249,15 @@ class CheckDataController: UIViewController {
             }
             
             for resault in resaults {
-                
+                self.count10 += 1
+                print("count10 \(self.count10)")
+//                    self.point2 = CGFloat(1 / self.countAll)
+                    self.progressCount += self.point2
+                print("point2 \(self.point2)")
                 let name = resault["acf"]["model_name"].stringValue
                 let number = resault["acf"]["model_number"].stringValue
-                if name != "false" && name != ""  || number != "false" && number != ""  {
-                    //prog
-                    let countPdfProd = self.appDelegate.productsDocCount
-                    let countPdfRef = self.appDelegate.refsDocCount
-                    var count: CGFloat!
-                    if countPdfRef != nil && countPdfRef != 0 && countPdfProd != nil && countPdfProd != 0  {
-                        count = self.appDelegate.allCountDoc! - countPdfRef!
-                    } else {
-                        //debug??
-                        if countPdfProd == nil {
-                            self.removeFromParent()
-                            self.view.removeFromSuperview()
-                        } else {
-                            count = CGFloat(countPdfProd!)
-                        }
-                    }
-                    if count != 0 && count != nil {
-                        print("add2 + \(CGFloat(1 / count!))")
-                        self.progressCount += CGFloat(1 / count!)
-                    }
+                if name != "false" && name != ""  || number != "false" && number != "" {
+                 
                     
                     //var
                     var alerts: String?
@@ -693,6 +685,10 @@ class CheckDataController: UIViewController {
                         UserDefaults.standard.synchronize()
                     }
                 }
+            }
+            
+            if self.progressBar.progress < 1 {
+                self.progressBar.progress += self.point2
             }
             
             for i in self.appDelegate.childs {

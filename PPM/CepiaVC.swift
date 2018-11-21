@@ -36,6 +36,8 @@ class CepiaVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         
         searchBarLbl.delegate = self
         
+//        appDelegate.subscribtion = true
+//        showSub(nameVC: "CheckDataController")
         
         if appDelegate.childs.count == 0 {
             appDelegate.fetchCoreDataRef()
@@ -62,11 +64,14 @@ class CepiaVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         ref2 = Database.database().reference(withPath: "users").child((self.user.uid)).child("disclaimer")
         refSub  = Database.database().reference(withPath: "users").child((self.user.uid)).child("subscription")
         refSub.setValue(["subscription": self.appDelegate.subscribtion])
+        
+        print("app \(appDelegate.subscribtion)")
     }
     
     
     
     override func viewWillAppear(_ animated: Bool) {
+        
         if Reachability.isConnectedToNetwork() == true {
             favorConnection()
 
@@ -81,7 +86,31 @@ class CepiaVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         
     }
     
+    override func viewWillLayoutSubviews() {
+        addTapGestureToHideKeyboard1()
+    }
+    
+    func addTapGestureToHideKeyboard1() {
+        
+        let tapGesture = UITapGestureRecognizer(target: view, action: #selector(view.endEditing))
+        if tableView.isHidden == true {
+            view.addGestureRecognizer(tapGesture)
+        } else {
+            if (view.gestureRecognizers?.count)! > 0 {
+                for i in (view?.gestureRecognizers)! {
+                    view.removeGestureRecognizer(i)
+                }
+            }
+            
+        }
+    }
+    func deleteTapGestureToHideKeyboard() {
+        let tapGesture = UITapGestureRecognizer(target: view, action: #selector(view.endEditing))
+        view.removeGestureRecognizer(tapGesture)
+    }
+    
     @objc func fireBaseSub() {
+        print("update999")
         self.refSub  = Database.database().reference(withPath: "users").child((self.user.uid)).child("subscription")
                                 self.refSub.setValue(["subscription": self.appDelegate.subscribtion])
     }
@@ -131,11 +160,12 @@ class CepiaVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
                     self.appDelegate.subscribtion = false
                 }
                 
-                //
                 if Reachability.isConnectedToNetwork() == true {
                     if value2 == 1 {
                         if self.showAlert == true {
-                        self.showSub(nameVC: "CheckDataController")
+                            if self.appDelegate.closeCheckData == false {
+                               self.showSub(nameVC: "CheckDataController")
+                            }
                         }
                     } else {
                         self.showSub(nameVC: "SubscribeAlert")
@@ -159,6 +189,9 @@ class CepiaVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
                 }
                 if Reachability.isConnectedToNetwork() == true {
                     if value == 1 {
+                        if self.appDelegate.closeCheckData == false {
+                            self.showSub(nameVC: "CheckDataController")
+                        }
                         let ref2  = Database.database().reference(withPath: "users").child((self.user.uid)).child("disclaimer")
                         ref2.setValue(["disclaimer": self.appDelegate.showDisc])
                     } else {
@@ -196,6 +229,7 @@ class CepiaVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         // 2
         carSectionTitles = [String](carsDictionary.keys)
         carSectionTitles = carSectionTitles.sorted(by: { $0 < $1 })
+        UserDefaults.standard.set(appDelegate.subscribtion, forKey: "subscribe2")
         
     }
     
@@ -210,14 +244,18 @@ class CepiaVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     //search bar
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         searchBar.text = searchText
+        
         if searchText != "" {
             isSearching = true
+        } else {
+            isSearching = false
         }
         
         showTable()
         tableView.reloadData()
         carsDictionary.removeAll()
         carSectionTitles.removeAll()
+        addTapGestureToHideKeyboard1()
         
         if searchText != "" {
             for i in appDelegate.referencesParent {
@@ -632,7 +670,6 @@ extension CepiaVC {
         }
         
             //при релизе включить
-        
         if segue.identifier == "showManufacturers" {
             let manuf = segue.destination as! Manufacturers
             manuf.from = from
